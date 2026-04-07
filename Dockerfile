@@ -40,10 +40,11 @@ RUN ls -la ./backend/static  # Debug: Verify files are present in the build
 # Set working directory to backend
 WORKDIR /app/backend
 
-# Render uses PORT env var; default to 10000
-ENV PORT=10000
+# Defaults for Hugging Face (7860); Render will override with its own $PORT
+ENV PORT=7860
 EXPOSE $PORT
 
 # Run Flask via Gunicorn
-# app:app references the module-level `app` created by create_app() in app.py
-CMD ["sh", "-c", "gunicorn -w 2 -b 0.0.0.0:${PORT} app:app"]
+# -w 1: Reduced to 1 worker to save memory (crucial for BERT on limited RAM)
+# --timeout 120: Increased to allow model weights to load without timing out
+CMD ["sh", "-c", "gunicorn -w 1 --timeout 120 -b 0.0.0.0:${PORT} app:app"]

@@ -59,6 +59,17 @@ def create_app():
         # This allows React Router to handle its own navigation
         return send_from_directory(app.static_folder, 'index.html')
 
+    @app.errorhandler(404)
+    def handle_404(e):
+        return jsonify({"error": "Resource not found"}), 404
+
+    @app.errorhandler(500)
+    def handle_500(e):
+        return jsonify({
+            "error": "Internal Server Error",
+            "message": str(e) if app.debug else "An unexpected error occurred. Please check server logs."
+        }), 500
+
     return app
 
 # Expose module-level app for Gunicorn
