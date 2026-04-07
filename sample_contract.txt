@@ -1,0 +1,26 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is made and entered into as of January 1, 2024 ("Effective Date") by and between TechCorp Inc., a Delaware corporation with its principal place of business at 123 Tech Lane, Silicon Valley, CA ("Employer"), and John Doe, an individual residing at 456 Main St, San Francisco, CA ("Employee").
+
+1. Position and Duties
+Employer hereby employs Employee as Senior Software Engineer.
+
+2. Term
+The employment term shall commence on the Effective Date and continue until terminated as provided herein.
+
+3. Compensation
+Employer shall pay Employee a base salary of $150,000 per year, payable in accordance with Employer's standard payroll practices.
+
+4. Termination
+This Agreement may be terminated by either party at any time, with or without cause, upon 30 days written notice to the other party. Employer may terminate this Agreement immediately for cause. The termination date of this contract is 2025-01-01 unless otherwise extended.
+
+5. Confidentiality
+Employee agrees not to disclose any confidential information of Employer during or after the term of employment.
+
+IN WITNESS WHEREOF, the parties hereto have executed this Agreement as of the date first above written.
+
+Employer: TechCorp Inc.
+By: Jane Smith, CEO
+
+Employee:
+John Doe

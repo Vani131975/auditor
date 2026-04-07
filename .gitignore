@@ -1,0 +1,65 @@
+# =========================
+# 🔐 ENV & SECRETS
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# 🐍 PYTHON (Backend)
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+venv/
+backend/venv/
+
+# temp uploads
+backend/temp_uploads/
+
+# logs / outputs
+*.log
+out*.txt
+
+# =========================
+# 🧠 DATASETS / MODELS
+# =========================
+CUAD_v1/
+
+# =========================
+# ⚛️ FRONTEND (React / Vite)
+# =========================
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+
+# build artifacts
+build/
+
+# =========================
+# 🐳 DOCKER
+# =========================
+*.tar
+*.log
+
+# =========================
+# 🧾 SYSTEM FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# 🛠️ IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# 🧪 TEST / MISC
+# =========================
+*.sqlite3
+*.db

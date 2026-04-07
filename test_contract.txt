@@ -1,0 +1,16 @@
+AGREEMENT FOR CONSULTING SERVICES
+
+1.  PARTIES
+This Agreement is entered into on March 16, 2026, by and between Acme Corp ("Client") and AI Auditor LLC ("Consultant").
+
+2.  SERVICES
+Consultant agrees to provide AI compliance auditing services for Client's software infrastructure.
+
+3.  TERM
+This Agreement shall commence on March 16, 2026, and shall terminate on December 31, 2026, unless extended by mutual written agreement.
+
+4.  CONFIDENTIALITY
+Both parties agree to maintain the confidentiality of any proprietary information shared during the engagement.
+
+5.  GOVERNING LAW
+This Agreement shall be governed by the laws of the State of California.
