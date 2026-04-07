@@ -1,12 +1,15 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from api.upload import upload_bp
-from apscheduler.schedulers.background import BackgroundScheduler
+from api.auth import auth_bp
 
 def create_app():
-    app = Flask(__name__)
-    CORS(app) # Allow frontend to communicate
+    # Determine the path to the React build (static folder)
+    static_folder = os.path.join(os.path.dirname(__file__), 'static')
+
+    app = Flask(__name__, static_folder=static_folder, static_url_path='')
+    CORS(app)  # Allow frontend to communicate
 
     # Configure upload folder
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'temp_uploads')
@@ -15,7 +18,6 @@ def create_app():
 
     # Register Blueprints
     app.register_blueprint(upload_bp, url_prefix='/api/v1')
-    from api.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
     # Health check endpoint
@@ -23,10 +25,26 @@ def create_app():
     def health_check():
         return jsonify({"status": "healthy", "service": "compliance-auditor"})
 
+    # -----------------------------------------------------------------------
+    # Catch-all: serve the React SPA for any non-API route.
+    # This is REQUIRED for React Router (BrowserRouter) to work on Render —
+    # direct navigation to /login, /upload, etc. would otherwise 404.
+    # -----------------------------------------------------------------------
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_react(path):
+        # If the path maps to a real static file (JS, CSS, images), serve it
+        static_file = os.path.join(app.static_folder, path)
+        if path and os.path.exists(static_file):
+            return send_from_directory(app.static_folder, path)
+        # Otherwise fall through to index.html so React Router handles routing
+        return send_from_directory(app.static_folder, 'index.html')
+
     return app
 
 
+# Expose module-level `app` so Gunicorn can find it without factory syntax
+app = create_app()
+
 if __name__ == '__main__':
-    # use_reloader=False prevents PyTorch/Transformers from crashing the server when it compiles cuda cache
-    app = create_app()
     app.run(debug=True, port=5000, use_reloader=False)

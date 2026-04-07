@@ -1,5 +1,5 @@
-# Optional: Render Blueprint configuration 
-# This file allows one-click deployment to Render using the Dockerfile.
+# Render Blueprint configuration
+# One-click deployment using the Dockerfile.
 services:
   - type: web
     name: ai-compliance-auditor
@@ -9,9 +9,13 @@ services:
     envVars:
       - key: GEMINI_API_KEY
         sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
       - key: WEAVIATE_URL
         sync: false
       - key: WEAVIATE_API_KEY
-        sync: false
-      - key: AZURE_STORAGE_CONNECTION_STRING
         sync: false

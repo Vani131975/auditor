@@ -1,5 +1,5 @@
-# 1️⃣ Build React Frontend
-FROM node:20-alpine as build-step
+# ── Stage 1: Build React Frontend ─────────────────────────────────────────────
+FROM node:20-alpine AS build-step
 
 WORKDIR /app/frontend
 
@@ -7,11 +7,11 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 
-# Copy all frontend files and build
+# Copy all frontend source and build
 COPY frontend/ ./
-RUN npm run build && ls -la  # Verify dist/ exists
+RUN npm run build
 
-# 2️⃣ Setup Python Backend + OCR
+# ── Stage 2: Python Backend ────────────────────────────────────────────────────
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -28,18 +28,19 @@ RUN apt-get update && apt-get install -y \
 COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# Copy backend source code
 COPY backend/ ./backend/
 
-# Copy React build (dist/) to Flask static folder
+# Copy the React build output into Flask's static folder
 COPY --from=build-step /app/frontend/dist ./backend/static
-
-# Expose Render port
-ENV PORT=10000
-EXPOSE $PORT
 
 # Set working directory to backend
 WORKDIR /app/backend
 
-# Run the Flask app with Gunicorn
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:10000", "app:create_app()"]
+# Render uses PORT env var; default to 10000
+ENV PORT=10000
+EXPOSE $PORT
+
+# Run Flask via Gunicorn
+# app:app references the module-level `app` created by create_app() in app.py
+CMD ["sh", "-c", "gunicorn -w 2 -b 0.0.0.0:${PORT} app:app"]
