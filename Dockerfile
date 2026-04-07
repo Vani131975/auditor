@@ -42,4 +42,4 @@ EXPOSE $PORT
 WORKDIR /app/backend
 
 # Run the Flask app with Gunicorn
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:10000", "app:create_app()"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:10000", "--factory", "app:create_app()"]
