@@ -10,8 +10,10 @@ def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     static_folder = os.path.join(base_dir, 'static')
     
-    # We set static_url_path to '/' so that files in 'static' are served at the root
-    app = Flask(__name__, static_folder=static_folder, static_url_path='/')
+    # CRITICAL: We DO NOT set static_url_path='/' here. 
+    # This allows our manual catch-all route to handle everything at the root level
+    # without competing with Flask's internal static file server.
+    app = Flask(__name__, static_folder=static_folder)
     CORS(app)
 
     # Configure upload folder
@@ -19,7 +21,7 @@ def create_app():
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-    # Register Blueprints BEFORE the catch-all
+    # Register Blueprints (Priority routes)
     app.register_blueprint(upload_bp, url_prefix='/api/v1')
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
@@ -29,30 +31,32 @@ def create_app():
         return jsonify({
             "status": "healthy", 
             "service": "compliance-auditor",
-            "static_folder_exists": os.path.exists(static_folder),
-            "index_exists": os.path.exists(os.path.join(static_folder, 'index.html'))
+            "paths": {
+                "base_dir": base_dir,
+                "static_folder": static_folder,
+            },
+            "exists": {
+                "static_folder": os.path.exists(static_folder),
+                "index_html": os.path.exists(os.path.join(static_folder, 'index.html'))
+            }
         })
 
-    # SPA Catch-all: Handled carefully to avoid shadowing static files or APIs
+    # SPA Catch-all: This handles the root '/', React routes ('/login'), 
+    # and also manually serves static assets from the root.
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve(path):
-        # Safety: API routes that didn't match blueprints shouldn't return HTML
+        # 1. API routes safety check
         if path.startswith('api/'):
-            print(f"DEBUG: 404 API Route: {path}", file=sys.stderr)
-            return jsonify({"error": "Resource not found"}), 404
+            return jsonify({"error": "API route not found"}), 404
 
-        # Try serving the file directly if it exists in the static folder
+        # 2. Try serving the path as a static file (e.g., assets/main.js, vite.svg)
         full_path = os.path.join(app.static_folder, path)
         if path != "" and os.path.exists(full_path):
             return send_from_directory(app.static_folder, path)
         
-        # Fallback to index.html for React Router
-        index_path = os.path.join(app.static_folder, 'index.html')
-        if not os.path.exists(index_path):
-            print(f"CRITICAL: index.html not found at {index_path}", file=sys.stderr)
-            return "Frontend build not found. Please check deployment logs.", 404
-            
+        # 3. Fallback to index.html for ALL other non-file paths
+        # This allows React Router to handle its own navigation
         return send_from_directory(app.static_folder, 'index.html')
 
     return app
@@ -61,6 +65,5 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    # Respect Render's PORT environment variable
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port, use_reloader=False)
