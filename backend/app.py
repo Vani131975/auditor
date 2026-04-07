@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
-from api.upload import upload_bp
+from backend.api.upload import upload_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 
 def create_app():
@@ -27,7 +27,8 @@ def create_app():
 
     return app
 
+app = create_app()
+
 if __name__ == '__main__':
     # use_reloader=False prevents PyTorch/Transformers from crashing the server when it compiles cuda cache
-    app = create_app()
     app.run(debug=True, port=5000, use_reloader=False)
