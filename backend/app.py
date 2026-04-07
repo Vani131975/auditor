@@ -4,6 +4,7 @@ from flask_cors import CORS
 from api.upload import upload_bp
 from api.auth import auth_bp
 
+
 def create_app():
     # Determine the path to the React build (static folder)
     static_folder = os.path.join(os.path.dirname(__file__), 'static')
@@ -16,7 +17,7 @@ def create_app():
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-    # Register Blueprints
+    # Register Blueprints (registered BEFORE the catch-all so they take priority)
     app.register_blueprint(upload_bp, url_prefix='/api/v1')
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
@@ -26,24 +27,28 @@ def create_app():
         return jsonify({"status": "healthy", "service": "compliance-auditor"})
 
     # -----------------------------------------------------------------------
-    # Catch-all: serve the React SPA for any non-API route.
-    # This is REQUIRED for React Router (BrowserRouter) to work on Render —
-    # direct navigation to /login, /upload, etc. would otherwise 404.
+    # Serve React SPA static assets
     # -----------------------------------------------------------------------
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve_react(path):
+        # API routes are handled by blueprints above — never fall through here.
+        # But as a safety net, return 404 JSON for any unmatched /api/ path.
+        if path.startswith('api/'):
+            return jsonify({"error": "Not found"}), 404
+
         # If the path maps to a real static file (JS, CSS, images), serve it
         static_file = os.path.join(app.static_folder, path)
         if path and os.path.exists(static_file):
             return send_from_directory(app.static_folder, path)
-        # Otherwise fall through to index.html so React Router handles routing
+
+        # Otherwise return index.html so React Router handles client-side routing
         return send_from_directory(app.static_folder, 'index.html')
 
     return app
 
 
-# Expose module-level `app` so Gunicorn can find it without factory syntax
+# Module-level app instance — required by Gunicorn (`gunicorn app:app`)
 app = create_app()
 
 if __name__ == '__main__':
