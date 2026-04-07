@@ -6,6 +6,9 @@ import {
 } from 'recharts';
 import { Users, FileText, Building, ArrowLeft, ShieldCheck } from 'lucide-react';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 export default function AdminDashboard() {
@@ -25,7 +28,7 @@ export default function AdminDashboard() {
 
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/admin/users', {
+        const response = await fetch(`${API_BASE}/api/v1/auth/admin/users`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

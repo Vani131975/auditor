@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, FileText, AlertTriangle, ShieldCheck, Info } from 'lucide-react';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 export default function SummaryPage() {
   const [reportData, setReportData] = useState(null);
 
@@ -60,7 +63,7 @@ export default function SummaryPage() {
               <Calendar className="mr-2 text-primary-500" size={20} />
               Important Dates
             </h3>
-            
+
             <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-600 before:to-transparent">
               <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full border border-dark-700 bg-dark-800 text-gray-400 group-[.is-active]:text-emerald-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 shadow-md">

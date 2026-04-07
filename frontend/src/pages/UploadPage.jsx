@@ -2,6 +2,9 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, File, CheckCircle, Loader, ShieldCheck, Zap, Lock, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
@@ -38,7 +41,7 @@ export default function UploadPage() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/v1/upload', {
+      const response = await fetch(`${API_BASE}/api/v1/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

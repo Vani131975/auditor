@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, FileText, Calendar, Loader } from 'lucide-react';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +17,7 @@ export default function HistoryPage() {
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://127.0.0.1:5000/api/v1/history', {
+      const response = await fetch(`${API_BASE}/api/v1/history`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

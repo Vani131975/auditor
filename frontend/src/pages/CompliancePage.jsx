@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Download, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 export default function CompliancePage() {
   const [reportData, setReportData] = useState(null);
   const [reportUrl, setReportUrl] = useState('');

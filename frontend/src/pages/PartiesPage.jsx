@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, UserCircle, Phone, Mail, MapPin, Info } from 'lucide-react';
 
+// Determine API base dynamically
+const API_BASE = import.meta.env.VITE_API_URL || "";  // empty string = same origin
+
 export default function PartiesPage() {
   const [reportData, setReportData] = useState(null);
 
@@ -43,7 +46,7 @@ export default function PartiesPage() {
         {parties.map((party, idx) => (
           <div key={idx} className="card relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
-            
+
             <div className="flex items-start justify-between mb-6 border-b border-gray-700/50 pb-4">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-dark-700 rounded-lg text-primary-400 border border-gray-600 shadow-inner">
