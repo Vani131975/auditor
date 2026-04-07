@@ -2,22 +2,19 @@ flask
 flask-cors
 gunicorn
 
-# env & utils
 python-dotenv
 requests
 
-# AI / APIs
 openai
 supabase
 weaviate-client
 azure-storage-blob
 
-# document processing
 pdfplumber
 python-docx
 pytesseract
 Pillow
 reportlab
 
-# optional but safe
 lxml
+apscheduler
