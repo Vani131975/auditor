@@ -9,6 +9,8 @@ RUN npm install
 
 # Copy all frontend source and build
 COPY frontend/ ./
+# Override any local .env — in production the API is on the same origin
+ENV VITE_API_URL=
 RUN npm run build
 
 # ── Stage 2: Python Backend ────────────────────────────────────────────────────
