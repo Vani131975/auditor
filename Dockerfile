@@ -35,6 +35,7 @@ COPY backend/ ./backend/
 
 # Copy the React build output into Flask's static folder
 COPY --from=build-step /app/frontend/dist ./backend/static
+RUN ls -la ./backend/static  # Debug: Verify files are present in the build
 
 # Set working directory to backend
 WORKDIR /app/backend

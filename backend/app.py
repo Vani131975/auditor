@@ -1,55 +1,66 @@
 import os
-from flask import Flask, jsonify, send_from_directory
+import sys
+from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from api.upload import upload_bp
 from api.auth import auth_bp
 
-
 def create_app():
-    # Determine the path to the React build (static folder)
-    static_folder = os.path.join(os.path.dirname(__file__), 'static')
-
-    app = Flask(__name__, static_folder=static_folder, static_url_path='')
-    CORS(app)  # Allow frontend to communicate
+    # Use absolute path for robustness on Render
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    static_folder = os.path.join(base_dir, 'static')
+    
+    # We set static_url_path to '/' so that files in 'static' are served at the root
+    app = Flask(__name__, static_folder=static_folder, static_url_path='/')
+    CORS(app)
 
     # Configure upload folder
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'temp_uploads')
+    UPLOAD_FOLDER = os.path.join(base_dir, 'temp_uploads')
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-    # Register Blueprints (registered BEFORE the catch-all so they take priority)
+    # Register Blueprints BEFORE the catch-all
     app.register_blueprint(upload_bp, url_prefix='/api/v1')
     app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 
-    # Health check endpoint
-    @app.route('/health', methods=['GET'])
+    # Comprehensive Health check
+    @app.route('/api/health', methods=['GET'])
     def health_check():
-        return jsonify({"status": "healthy", "service": "compliance-auditor"})
+        return jsonify({
+            "status": "healthy", 
+            "service": "compliance-auditor",
+            "static_folder_exists": os.path.exists(static_folder),
+            "index_exists": os.path.exists(os.path.join(static_folder, 'index.html'))
+        })
 
-    # -----------------------------------------------------------------------
-    # Serve React SPA static assets
-    # -----------------------------------------------------------------------
+    # SPA Catch-all: Handled carefully to avoid shadowing static files or APIs
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
-    def serve_react(path):
-        # API routes are handled by blueprints above — never fall through here.
-        # But as a safety net, return 404 JSON for any unmatched /api/ path.
+    def serve(path):
+        # Safety: API routes that didn't match blueprints shouldn't return HTML
         if path.startswith('api/'):
-            return jsonify({"error": "Not found"}), 404
+            print(f"DEBUG: 404 API Route: {path}", file=sys.stderr)
+            return jsonify({"error": "Resource not found"}), 404
 
-        # If the path maps to a real static file (JS, CSS, images), serve it
-        static_file = os.path.join(app.static_folder, path)
-        if path and os.path.exists(static_file):
+        # Try serving the file directly if it exists in the static folder
+        full_path = os.path.join(app.static_folder, path)
+        if path != "" and os.path.exists(full_path):
             return send_from_directory(app.static_folder, path)
-
-        # Otherwise return index.html so React Router handles client-side routing
+        
+        # Fallback to index.html for React Router
+        index_path = os.path.join(app.static_folder, 'index.html')
+        if not os.path.exists(index_path):
+            print(f"CRITICAL: index.html not found at {index_path}", file=sys.stderr)
+            return "Frontend build not found. Please check deployment logs.", 404
+            
         return send_from_directory(app.static_folder, 'index.html')
 
     return app
 
-
-# Module-level app instance — required by Gunicorn (`gunicorn app:app`)
+# Expose module-level app for Gunicorn
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, use_reloader=False)
+    # Respect Render's PORT environment variable
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port, use_reloader=False)
