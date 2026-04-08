@@ -60,7 +60,7 @@ export default function UploadPage() {
 
   const stats = [
     { icon: ShieldCheck, label: 'Compliance Checks', value: '200+' },
-    { icon: Zap, label: 'Avg. Analysis Time', value: '< 30s' },
+    { icon: Zap, label: 'Avg. Analysis Time', value: '< 2 mins' },
     { icon: Lock, label: 'Secure & Private', value: '256-bit' },
     { icon: FileText, label: 'Formats Supported', value: 'PDF · DOCX · TXT' },
   ];
@@ -525,7 +525,7 @@ export default function UploadPage() {
               {
                 icon: Zap,
                 title: 'Results in Seconds',
-                desc: 'Our AI engine processes even complex multi-page contracts in under 30 seconds.',
+                desc: 'Our AI engine processes even complex multi-page contracts in under 2 minutes.',
               },
               {
                 icon: FileText,
@@ -534,7 +534,7 @@ export default function UploadPage() {
               },
               {
                 icon: Lock,
-                title: 'GDPR & SOC 2 Ready',
+                title: 'GDPR Ready',
                 desc: 'Infrastructure built to enterprise compliance standards so your data stays yours.',
               },
             ].map(({ icon: Icon, title, desc }) => (
